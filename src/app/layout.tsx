@@ -1,26 +1,27 @@
 import type { Metadata } from 'next';
-import { Inspector } from 'react-dev-inspector';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: '我的博客 | 个人技术博客',
-    template: '%s | 我的博客',
+    default: '株洲若水财税服务公司',
+    template: '%s | 株洲若水财税服务公司',
   },
   description:
-    '分享技术见解、生活感悟和读书笔记的个人博客',
+    '专业的财税服务公司，提供代理记账、税务筹划、公司注册、财务咨询等服务',
   keywords: [
-    '博客',
-    '技术',
-    'React',
-    'TypeScript',
-    'Next.js',
+    '财税服务',
+    '代理记账',
+    '税务筹划',
+    '公司注册',
+    '财务咨询',
+    '株洲',
+    '石峰区',
   ],
-  authors: [{ name: '博主' }],
+  authors: [{ name: '株洲若水财税服务公司' }],
   generator: 'Coze Code',
   openGraph: {
-    title: '我的博客',
-    description: '分享技术见解、生活感悟和读书笔记',
+    title: '株洲若水财税服务公司',
+    description: '专业的财税服务公司',
     locale: 'zh_CN',
     type: 'website',
   },
@@ -32,15 +33,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const isDev = process.env.COZE_PROJECT_ENV === 'DEV';
-
+}) {
   return (
     <html lang="zh-CN">
-      <body className={`antialiased`}>
-        {isDev && <Inspector />}
+      <body className="antialiased">
         {children}
       </body>
     </html>
