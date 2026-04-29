@@ -27,7 +27,7 @@ export async function sendContactEmail(data: {
   try {
     const { data: result, error } = await resend.emails.send({
       from: 'contact@wushuangcw.top',
-      to: process.env.CONTACT_EMAIL || 'w13517401680@163.com',
+      to: 'wang@wushuangcw.top',
       subject: `新的咨询：${name} - ${phone}`,
       text: `
 姓名: ${name}
