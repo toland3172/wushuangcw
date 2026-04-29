@@ -33,24 +33,39 @@ export default function ContactForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 模拟提交
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitting(false);
-    setSubmitted(true);
-
-    // 3秒后重置表单
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: "",
-        phone: "",
-        wechat: "",
-        company: "",
-        service: "",
-        message: "",
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-    }, 3000);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "提交失败");
+      }
+
+      setIsSubmitting(false);
+      setSubmitted(true);
+
+      // 3秒后重置表单
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          name: "",
+          phone: "",
+          wechat: "",
+          company: "",
+          service: "",
+          message: "",
+        });
+      }, 3000);
+    } catch (error) {
+      setIsSubmitting(false);
+      alert(error instanceof Error ? error.message : "提交失败，请稍后重试");
+    }
   };
 
   if (submitted) {
