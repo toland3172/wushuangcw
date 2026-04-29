@@ -19,9 +19,11 @@ export default function FinanceNavbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">若</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="若水财税" 
+              className="w-12 h-12 rounded-lg object-contain"
+            />
             <div>
               <span className="text-xl font-bold text-gray-800">若水财税</span>
               <span className="block text-xs text-gray-500 -mt-1">专业 · 诚信 · 高效</span>
