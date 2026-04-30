@@ -6,6 +6,7 @@ import { useState } from "react";
 const navItems = [
   { href: "/", label: "首页" },
   { href: "/services", label: "服务项目" },
+  { href: "/insights", label: "财税洞察" },
   { href: "/about", label: "关于我们" },
   { href: "/contact", label: "联系我们" },
 ];

@@ -35,6 +35,7 @@ export default function FinanceFooter() {
               <li><Link href="/" className="text-lg hover:text-white transition-colors">首页</Link></li>
               <li><Link href="/about" className="text-lg hover:text-white transition-colors">关于我们</Link></li>
               <li><Link href="/services" className="text-lg hover:text-white transition-colors">服务项目</Link></li>
+              <li><Link href="/insights" className="text-lg hover:text-white transition-colors">财税洞察</Link></li>
               <li><Link href="/contact" className="text-lg hover:text-white transition-colors">联系我们</Link></li>
             </ul>
           </div>
