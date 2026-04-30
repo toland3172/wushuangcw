@@ -42,12 +42,12 @@ export default function FinanceNavbar() {
                 {item.label}
               </Link>
             ))}
-            <a
-              href="tel:13517401680"
+            <Link
+              href="/contact"
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-lg font-medium"
             >
               立即咨询
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -83,12 +83,13 @@ export default function FinanceNavbar() {
                 {item.label}
               </Link>
             ))}
-            <a
-              href="tel:13517401680"
+            <Link
+              href="/contact"
               className="block mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg text-center text-lg font-medium"
+              onClick={() => setIsMenuOpen(false)}
             >
               立即咨询
-            </a>
+            </Link>
           </div>
         )}
       </div>
