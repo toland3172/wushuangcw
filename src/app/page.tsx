@@ -124,7 +124,7 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">为什么选择我们</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[
-                { icon: "🏆", title: "专业资质", desc: "正规代理记账资质" },
+                { icon: "🏆", title: "专业资质", desc: "专业财税服务资质" },
                 { icon: "🤝", title: "贴心服务", desc: "一对一专属服务" },
                 { icon: "💡", title: "合理收费", desc: "透明定价无隐形费用" },
                 { icon: "🔒", title: "数据安全", desc: "严格保密财务信息" },

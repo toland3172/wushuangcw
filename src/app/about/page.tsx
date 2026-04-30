@@ -38,7 +38,7 @@ export default function AboutPage() {
                     "若水"出自老子《道德经》"上善若水"，寓意我们追求像水一样柔顺而有力的服务品质，以专业知识和真诚态度为客户排忧解难。
                   </p>
                   <p>
-                    公司拥有一支经验丰富的专业团队，团队成员均具备会计从业资格证和丰富的实战经验，能够为客户提供高质量的财税服务。
+                    公司拥有一支经验丰富的专业团队，团队成员均具备中级会计职称证书和丰富的实战经验，能够为客户提供高质量的财税服务。
                   </p>
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function AboutPage() {
               <div className="bg-white rounded-xl shadow-lg p-8 text-center">
                 <div className="text-5xl mb-4">📜</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">专业团队认证</h3>
-                <p className="text-lg text-gray-600">团队成员均持有会计从业资格证</p>
+                <p className="text-lg text-gray-600">团队成员均持有中级会计职称证书</p>
               </div>
               <div className="bg-white rounded-xl shadow-lg p-8 text-center">
                 <div className="text-5xl mb-4">🛡️</div>
