@@ -138,8 +138,8 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-white rounded-xl shadow-lg p-8 text-center">
                 <div className="text-5xl mb-4">🏅</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">正规代理记账资质</h3>
-                <p className="text-lg text-gray-600">持有财政局颁发的代理记账许可证</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">多年行业经验</h3>
+                <p className="text-lg text-gray-600">深耕财税领域，服务众多中小企业</p>
               </div>
               <div className="bg-white rounded-xl shadow-lg p-8 text-center">
                 <div className="text-5xl mb-4">📜</div>

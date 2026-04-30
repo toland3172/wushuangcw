@@ -1,93 +1,93 @@
-'use client';
-
-import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { FileText, TrendingUp, Calendar, ArrowRight, Tag, Mail } from 'lucide-react';
+import { db } from '@/lib/db';
+import { posts, categories, postTags, tags } from '@/storage/database/shared/schema';
+import { desc, eq, and } from 'drizzle-orm';
 
-interface Article {
-  id: number;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  cover_image: string | null;
-  published_at: string | null;
-  author: string | null;
-  view_count: number;
-  category_name: string | null;
-  category_slug: string | null;
-  tags: { name: string; slug: string }[];
-}
+export const revalidate = 300; // ISR: 5分钟重新验证
 
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  article_count: number;
-}
+export const metadata = {
+  title: '财税洞察 - 株洲若水财税',
+  description: '分享行业洞见、实战案例、最新政策解读，助力企业财税合规',
+};
 
-function InsightsContent() {
-  const searchParams = useSearchParams();
-  const pageParam = searchParams.get('page') || '1';
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [hotArticles, setHotArticles] = useState<Article[]>([]);
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 10, total: 0, totalPages: 0 });
-  const [loading, setLoading] = useState(true);
-  const [subEmail, setSubEmail] = useState('');
-  const [subMsg, setSubMsg] = useState('');
+export default async function InsightsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const params = await searchParams;
+  const page = parseInt(params.page || '1');
+  const pageSize = 10;
 
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const [articlesRes, categoriesRes] = await Promise.all([
-          fetch(`/api/articles?page=${pageParam}&pageSize=10`),
-          fetch('/api/categories'),
-        ]);
-        const articlesData = await articlesRes.json();
-        const categoriesData = await categoriesRes.json();
+  // 服务端直接查询数据库
+  const allArticles = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      slug: posts.slug,
+      excerpt: posts.excerpt,
+      published_at: posts.published_at,
+      author: posts.author,
+      view_count: posts.view_count,
+      category_name: categories.name,
+      category_slug: categories.slug,
+    })
+    .from(posts)
+    .leftJoin(categories, eq(posts.category_id, categories.id))
+    .where(eq(posts.published, true))
+    .orderBy(desc(posts.published_at));
 
-        if (articlesData.articles) {
-          setArticles(articlesData.articles);
-          setPagination(articlesData.pagination);
-          // Hot articles = same list sorted by view_count
-          setHotArticles([...articlesData.articles].sort((a: Article, b: Article) => b.view_count - a.view_count).slice(0, 5));
-        }
-        if (categoriesData.categories) {
-          setCategories(categoriesData.categories);
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      } finally {
-        setLoading(false);
+  // 获取标签
+  const allPostTags = await db
+    .select({
+      post_id: postTags.postId,
+      tag_name: tags.name,
+      tag_slug: tags.slug,
+    })
+    .from(postTags)
+    .leftJoin(tags, eq(postTags.tagId, tags.id));
+
+  const tagMap = new Map<number, { name: string; slug: string }[]>();
+  for (const pt of allPostTags) {
+    if (!tagMap.has(pt.post_id)) tagMap.set(pt.post_id, []);
+    if (pt.tag_name && pt.tag_slug) {
+      tagMap.get(pt.post_id)!.push({ name: pt.tag_name, slug: pt.tag_slug });
+    }
+  }
+
+  // 分页
+  const total = allArticles.length;
+  const totalPages = Math.ceil(total / pageSize);
+  const pagedArticles = allArticles.slice((page - 1) * pageSize, page * pageSize);
+
+  // 热门文章
+  const hotArticles = [...allArticles].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 5);
+
+  // 分类
+  const allCategories = await db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      description: categories.description,
+    })
+    .from(categories)
+    .orderBy(categories.id);
+
+  // 计算每个分类文章数
+  const categoryCounts = new Map<number, number>();
+  for (const article of allArticles) {
+    if (article.category_slug) {
+      // 找到对应的 category id
+      const cat = allCategories.find(c => c.slug === article.category_slug);
+      if (cat) {
+        categoryCounts.set(cat.id, (categoryCounts.get(cat.id) || 0) + 1);
       }
     }
-    fetchData();
-  }, [pageParam]);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (subEmail) {
-      setSubMsg('感谢订阅！我们会及时为您推送最新资讯。');
-      setSubEmail('');
-    }
-  };
+  }
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-500">加载中...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,11 +103,11 @@ function InsightsContent() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
           <div className="flex-1">
-            {articles.length === 0 ? (
+            {pagedArticles.length === 0 ? (
               <div className="text-center py-20 text-gray-500 text-xl">暂无文章</div>
             ) : (
               <div className="space-y-6">
-                {articles.map((article) => (
+                {pagedArticles.map((article) => (
                   <Link
                     key={article.id}
                     href={`/insights/${article.slug}`}
@@ -127,7 +127,7 @@ function InsightsContent() {
                           </span>
                           <span className="text-sm text-gray-400 flex items-center gap-1">
                             <TrendingUp className="w-4 h-4" />
-                            {article.view_count} 次阅读
+                            {article.view_count || 0} 次阅读
                           </span>
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-2 hover:text-blue-700 transition-colors">
@@ -136,10 +136,10 @@ function InsightsContent() {
                         {article.excerpt && (
                           <p className="text-lg text-gray-600 mb-3 line-clamp-2">{article.excerpt}</p>
                         )}
-                        {article.tags && article.tags.length > 0 && (
+                        {(tagMap.get(article.id) || []).length > 0 && (
                           <div className="flex items-center gap-2 flex-wrap">
                             <Tag className="w-4 h-4 text-gray-400" />
-                            {article.tags.map((tag) => (
+                            {(tagMap.get(article.id) || []).map((tag) => (
                               <span key={tag.slug} className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                                 {tag.name}
                               </span>
@@ -157,14 +157,14 @@ function InsightsContent() {
             )}
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
+            {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-10">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                   <Link
                     key={p}
                     href={`/insights?page=${p}`}
                     className={`px-5 py-2 rounded-lg text-lg font-medium transition-colors ${
-                      p === pagination.page
+                      p === page
                         ? 'bg-blue-600 text-white'
                         : 'bg-white text-gray-700 hover:bg-blue-50 border border-gray-200'
                     }`}
@@ -211,7 +211,7 @@ function InsightsContent() {
                 文章分类
               </h3>
               <div className="space-y-2">
-                {categories.map((cat) => (
+                {allCategories.filter(c => ['industry', 'case', 'peer'].includes(c.slug)).map((cat) => (
                   <Link
                     key={cat.id}
                     href={`/insights/category/${cat.slug}`}
@@ -219,7 +219,7 @@ function InsightsContent() {
                   >
                     <span className="text-base text-gray-700 group-hover:text-blue-600">{cat.name}</span>
                     <span className="text-sm text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                      {cat.article_count}
+                      {categoryCounts.get(cat.id) || 0}
                     </span>
                   </Link>
                 ))}
@@ -228,38 +228,19 @@ function InsightsContent() {
 
             {/* Subscribe CTA */}
             <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 text-white">
+              <Mail className="w-8 h-8 mb-3" />
               <h3 className="text-xl font-bold mb-2">关注我们</h3>
-              <p className="text-base text-blue-100 mb-4">获取最新财税资讯与政策解读</p>
-              <form onSubmit={handleSubscribe} className="space-y-3">
-                <input
-                  type="email"
-                  value={subEmail}
-                  onChange={(e) => setSubEmail(e.target.value)}
-                  placeholder="请输入邮箱地址"
-                  required
-                  className="w-full px-4 py-3 rounded-lg text-gray-900 text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-white text-blue-700 font-bold py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors text-base"
-                >
-                  <Mail className="w-4 h-4 inline mr-1" />
-                  订阅
-                </button>
-              </form>
-              {subMsg && <p className="text-sm text-blue-200 mt-2">{subMsg}</p>}
+              <p className="text-blue-100 mb-4">获取最新财税资讯与政策解读</p>
+              <a
+                href="/contact"
+                className="block w-full bg-white text-blue-700 text-center py-3 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors"
+              >
+                立即咨询
+              </a>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function InsightsPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-xl text-gray-500">加载中...</div>}>
-      <InsightsContent />
-    </Suspense>
   );
 }

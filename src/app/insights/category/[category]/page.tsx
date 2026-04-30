@@ -1,20 +1,11 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { Calendar, Eye, ArrowRight } from 'lucide-react';
+import { db } from '@/lib/db';
+import { posts, categories } from '@/storage/database/shared/schema';
+import { desc, eq, and } from 'drizzle-orm';
+import { notFound } from 'next/navigation';
 
-interface Article {
-  id: number;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  published_at: string | null;
-  view_count: number;
-  category_name: string | null;
-  category_slug: string | null;
-}
+export const revalidate = 300;
 
 const CATEGORY_NAMES: Record<string, string> = {
   industry: '行业动态',
@@ -22,42 +13,45 @@ const CATEGORY_NAMES: Record<string, string> = {
   peer: '同业交流',
 };
 
-export default function CategoryPage() {
-  const params = useParams();
-  const category = params.category as string;
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params;
+  const categoryName = CATEGORY_NAMES[category] || category;
+  return {
+    title: `${categoryName} - 财税洞察 - 株洲若水财税`,
+    description: `浏览${categoryName}分类下的所有文章`,
+  };
+}
 
-  useEffect(() => {
-    async function fetchArticles() {
-      try {
-        const res = await fetch(`/api/articles/category/${category}`);
-        const data = await res.json();
-        if (data.articles) setArticles(data.articles);
-      } catch (error) {
-        console.error('Failed to fetch articles:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (category) fetchArticles();
-  }, [category]);
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params;
+  const categoryName = CATEGORY_NAMES[category];
+
+  if (!categoryName) notFound();
+
+  // 查询分类ID
+  const catRows = await db.select().from(categories).where(eq(categories.slug, category)).limit(1);
+  if (catRows.length === 0) notFound();
+  const categoryId = catRows[0].id;
+
+  // 查询文章
+  const articleRows = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      slug: posts.slug,
+      excerpt: posts.excerpt,
+      published_at: posts.published_at,
+      view_count: posts.view_count,
+    })
+    .from(posts)
+    .where(and(eq(posts.published, true), eq(posts.category_id, categoryId)))
+    .orderBy(desc(posts.published_at));
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
   };
-
-  const categoryName = CATEGORY_NAMES[category] || category;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-500">加载中...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -74,11 +68,11 @@ export default function CategoryPage() {
 
       {/* Articles */}
       <div className="max-w-6xl mx-auto px-4 py-10">
-        {articles.length === 0 ? (
+        {articleRows.length === 0 ? (
           <div className="text-center text-xl text-gray-500 py-20">暂无文章</div>
         ) : (
           <div className="space-y-6">
-            {articles.map((article) => (
+            {articleRows.map((article) => (
               <Link
                 key={article.id}
                 href={`/insights/${article.slug}`}
@@ -111,3 +105,4 @@ export default function CategoryPage() {
     </div>
   );
 }
+

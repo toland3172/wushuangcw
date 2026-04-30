@@ -1,74 +1,96 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { Calendar, User, ArrowLeft, ArrowRight, Phone, MessageCircle, Tag } from 'lucide-react';
+import { Calendar, User, ArrowLeft, ArrowRight, Phone, Tag } from 'lucide-react';
+import { db } from '@/lib/db';
+import { posts, categories, postTags, tags } from '@/storage/database/shared/schema';
+import { desc, eq, and, lt, gt, inArray } from 'drizzle-orm';
+import { notFound } from 'next/navigation';
 
-interface Article {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string | null;
-  published_at: string | null;
-  author: string | null;
-  view_count: number;
-  category_name: string | null;
-  category_slug: string | null;
-  tags: { name: string; slug: string }[];
-  prev_article: { title: string; slug: string } | null;
-  next_article: { title: string; slug: string } | null;
-  related_articles: { id: number; title: string; slug: string; excerpt: string | null }[];
+export const revalidate = 300;
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  try {
+    const result = await db.select().from(posts).where(and(eq(posts.slug, slug), eq(posts.published, true))).limit(1);
+    if (result.length === 0) return { title: '文章未找到 - 株洲若水财税' };
+    return {
+      title: `${result[0].title} - 株洲若水财税`,
+      description: result[0].excerpt || undefined,
+    };
+  } catch {
+    return { title: '财税洞察 - 株洲若水财税' };
+  }
 }
 
-export default function ArticlePage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const [article, setArticle] = useState<Article | null>(null);
-  const [loading, setLoading] = useState(true);
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-  useEffect(() => {
-    async function fetchArticle() {
-      try {
-        const res = await fetch(`/api/articles/${slug}`);
-        const data = await res.json();
-        if (data.article) {
-          setArticle(data.article);
-        }
-      } catch (error) {
-        console.error('Failed to fetch article:', error);
-      } finally {
-        setLoading(false);
-      }
+  // 查询文章
+  const articleRows = await db
+    .select()
+    .from(posts)
+    .where(and(eq(posts.slug, slug), eq(posts.published, true)))
+    .limit(1);
+
+  if (articleRows.length === 0) notFound();
+
+  const article = articleRows[0];
+
+  // 查询分类
+  let categoryName: string | null = null;
+  let categorySlug: string | null = null;
+  if (article.category_id) {
+    const catRows = await db.select().from(categories).where(eq(categories.id, article.category_id)).limit(1);
+    if (catRows.length > 0) {
+      categoryName = catRows[0].name;
+      categorySlug = catRows[0].slug;
     }
-    if (slug) fetchArticle();
-  }, [slug]);
+  }
+
+  // 查询标签
+  const articleTags = await db
+    .select({ name: tags.name, slug: tags.slug })
+    .from(postTags)
+    .leftJoin(tags, eq(postTags.tagId, tags.id))
+    .where(eq(postTags.postId, article.id));
+
+  // 查询上一篇/下一篇
+  const publishedAt = article.published_at || new Date().toISOString();
+
+  const prevRows = await db
+    .select({ title: posts.title, slug: posts.slug })
+    .from(posts)
+    .where(and(eq(posts.published, true), lt(posts.published_at, publishedAt)))
+    .orderBy(desc(posts.published_at))
+    .limit(1);
+
+  const nextRows = await db
+    .select({ title: posts.title, slug: posts.slug })
+    .from(posts)
+    .where(and(eq(posts.published, true), gt(posts.published_at, publishedAt)))
+    .orderBy(posts.published_at)
+    .limit(1);
+
+  const prevArticle = prevRows.length > 0 ? prevRows[0] : null;
+  const nextArticle = nextRows.length > 0 ? nextRows[0] : null;
+
+  // 相关推荐：同分类的其他文章
+  let relatedArticles: { id: number; title: string; slug: string; excerpt: string | null }[] = [];
+  if (article.category_id) {
+    relatedArticles = await db
+      .select({ id: posts.id, title: posts.title, slug: posts.slug, excerpt: posts.excerpt })
+      .from(posts)
+      .where(and(eq(posts.published, true), eq(posts.category_id, article.category_id)))
+      .orderBy(desc(posts.published_at))
+      .limit(4);
+    // 排除当前文章
+    relatedArticles = relatedArticles.filter(r => r.id !== article.id).slice(0, 3);
+  }
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-500">加载中...</div>
-      </div>
-    );
-  }
-
-  if (!article) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">文章未找到</h1>
-          <Link href="/insights" className="text-blue-600 text-lg hover:underline">返回财税洞察</Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -80,9 +102,9 @@ export default function ArticlePage() {
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mt-4 mb-4">{article.title}</h1>
           <div className="flex flex-wrap items-center gap-4 text-base text-blue-200">
-            {article.category_name && (
-              <Link href={`/insights/category/${article.category_slug}`} className="bg-blue-700/50 text-white px-3 py-1 rounded-full hover:bg-blue-700">
-                {article.category_name}
+            {categoryName && (
+              <Link href={`/insights/category/${categorySlug}`} className="bg-blue-700/50 text-white px-3 py-1 rounded-full hover:bg-blue-700">
+                {categoryName}
               </Link>
             )}
             <span className="flex items-center gap-1">
@@ -95,11 +117,11 @@ export default function ArticlePage() {
             </span>
             <span>{article.view_count} 次阅读</span>
           </div>
-          {article.tags && article.tags.length > 0 && (
+          {articleTags.length > 0 && (
             <div className="flex items-center gap-2 mt-3 flex-wrap">
               <Tag className="w-4 h-4 text-blue-300" />
-              {article.tags.map((tag) => (
-                <span key={tag.slug} className="text-sm text-blue-200 bg-blue-700/40 px-2 py-0.5 rounded">
+              {articleTags.map((tag) => (
+                tag.name && <span key={tag.slug} className="text-sm text-blue-200 bg-blue-700/40 px-2 py-0.5 rounded">
                   {tag.name}
                 </span>
               ))}
@@ -119,7 +141,7 @@ export default function ArticlePage() {
             prose-li:text-lg prose-li:text-gray-700
             prose-strong:text-gray-900
             prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline"
-          dangerouslySetInnerHTML={{ __html: article.content }}
+          dangerouslySetInnerHTML={{ __html: article.content || '' }}
         />
 
         {/* CTA */}
@@ -131,32 +153,31 @@ export default function ArticlePage() {
               <Phone className="w-5 h-5" />
               13517401680
             </a>
-
           </div>
         </div>
 
         {/* Prev / Next */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {article.prev_article ? (
+          {prevArticle ? (
             <Link
-              href={`/insights/${article.prev_article.slug}`}
+              href={`/insights/${prevArticle.slug}`}
               className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow flex items-start gap-3"
             >
               <ArrowLeft className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
               <div>
                 <span className="text-sm text-gray-400">上一篇</span>
-                <p className="text-base font-medium text-gray-900 line-clamp-2">{article.prev_article.title}</p>
+                <p className="text-base font-medium text-gray-900 line-clamp-2">{prevArticle.title}</p>
               </div>
             </Link>
           ) : <div />}
-          {article.next_article ? (
+          {nextArticle ? (
             <Link
-              href={`/insights/${article.next_article.slug}`}
+              href={`/insights/${nextArticle.slug}`}
               className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow flex items-start gap-3 text-right"
             >
               <div>
                 <span className="text-sm text-gray-400">下一篇</span>
-                <p className="text-base font-medium text-gray-900 line-clamp-2">{article.next_article.title}</p>
+                <p className="text-base font-medium text-gray-900 line-clamp-2">{nextArticle.title}</p>
               </div>
               <ArrowRight className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
             </Link>
@@ -164,11 +185,11 @@ export default function ArticlePage() {
         </div>
 
         {/* Related Articles */}
-        {article.related_articles && article.related_articles.length > 0 && (
+        {relatedArticles.length > 0 && (
           <div className="mt-10">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">相关推荐</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {article.related_articles.map((related) => (
+              {relatedArticles.map((related) => (
                 <Link
                   key={related.id}
                   href={`/insights/${related.slug}`}
