@@ -84,9 +84,6 @@ export default function HomePage() {
               <a href="tel:13517401680" className="inline-flex items-center justify-center bg-white text-blue-700 px-8 py-4 rounded-lg text-xl font-semibold hover:bg-blue-50">
                 📞 立即致电：13517401680
               </a>
-              <Link href="/contact" className="inline-flex items-center justify-center border-2 border-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-white/10">
-                💬 在线咨询
-              </Link>
             </div>
           </div>
         </section>

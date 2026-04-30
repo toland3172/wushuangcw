@@ -131,10 +131,7 @@ export default function ArticlePage() {
               <Phone className="w-5 h-5" />
               13517401680
             </a>
-            <a href="https://wushuangcw.top/contact" className="inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold py-3 px-6 rounded-lg hover:bg-white/10 transition-colors text-lg">
-              <MessageCircle className="w-5 h-5" />
-              在线咨询
-            </a>
+
           </div>
         </div>
 

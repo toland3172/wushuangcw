@@ -164,9 +164,6 @@ export default function AboutPage() {
               <a href="tel:13517401680" className="inline-flex items-center bg-white text-blue-700 px-10 py-4 rounded-lg text-xl font-semibold hover:bg-blue-50">
                 📞 拨打热线：13517401680
               </a>
-              <Link href="/contact" className="inline-flex items-center border-2 border-white text-white px-10 py-4 rounded-lg text-xl font-semibold hover:bg-white/10">
-                💬 在线咨询
-              </Link>
             </div>
           </div>
         </section>
