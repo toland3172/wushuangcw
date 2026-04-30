@@ -79,54 +79,65 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Business Scope */}
+        {/* Corporate Culture */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl font-bold text-gray-900 mb-10 text-center">经营范围</h2>
-            <div className="bg-white rounded-2xl shadow-lg p-10">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">一般项目</h3>
-              <ul className="grid md:grid-cols-2 gap-4 text-xl text-gray-600 mb-10">
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  财务咨询
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  税务服务
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  企业管理咨询
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  代理记账
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  商务代理代办服务
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  市场营销策划
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  信息咨询服务
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  教育咨询服务
-                </li>
-              </ul>
+            <h2 className="text-4xl font-bold text-gray-900 mb-10 text-center">企业文化</h2>
 
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">许可项目</h3>
-              <ul className="grid md:grid-cols-2 gap-4 text-xl text-gray-600">
-                <li className="flex items-start">
-                  <span className="text-blue-500 mr-3 text-xl">✓</span>
-                  代理记账许可
-                </li>
-              </ul>
+            {/* Mission & Vision */}
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div className="bg-white rounded-2xl shadow-lg p-10 border-l-4 border-blue-600">
+                <h3 className="text-2xl font-bold text-blue-800 mb-4">使命</h3>
+                <p className="text-xl text-gray-700 leading-relaxed">
+                  以专业财税智慧，滋养企业发展，如同水润万物，助力企业行稳致远。
+                </p>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-10 border-l-4 border-blue-600">
+                <h3 className="text-2xl font-bold text-blue-800 mb-4">愿景</h3>
+                <p className="text-xl text-gray-700 leading-relaxed">
+                  成为中小企业最信赖的财税服务伙伴，让每一家企业在合规经营中稳健成长。
+                </p>
+              </div>
+            </div>
+
+            {/* Core Values */}
+            <div className="bg-white rounded-2xl shadow-lg p-10">
+              <h3 className="text-3xl font-bold text-gray-900 mb-3 text-center">价值观</h3>
+              <p className="text-xl text-center text-blue-700 font-semibold mb-10">上善若水，四德为纲</p>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="flex items-start bg-gradient-to-r from-blue-50 to-white rounded-xl p-6">
+                  <span className="text-4xl mr-5 mt-1">🌊</span>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-1">专业如水</h4>
+                    <p className="text-lg text-blue-700 font-semibold mb-2">专业·奔流不息</p>
+                    <p className="text-lg text-gray-600">"流水不腐"，代表我们持续学习、精进，以专业能力为企业带来活水般的价值。</p>
+                  </div>
+                </div>
+                <div className="flex items-start bg-gradient-to-r from-cyan-50 to-white rounded-xl p-6">
+                  <span className="text-4xl mr-5 mt-1">💧</span>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-1">诚信如水</h4>
+                    <p className="text-lg text-blue-700 font-semibold mb-2">透明·清澈见底</p>
+                    <p className="text-lg text-gray-600">代表我们正直、坦荡，一切行为公开透明，经得起检验。</p>
+                  </div>
+                </div>
+                <div className="flex items-start bg-gradient-to-r from-sky-50 to-white rounded-xl p-6">
+                  <span className="text-4xl mr-5 mt-1">🌿</span>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-1">服务如水</h4>
+                    <p className="text-lg text-blue-700 font-semibold mb-2">利他·润物无声</p>
+                    <p className="text-lg text-gray-600">代表我们时刻以客户为中心，提供恰到好处、不张扬但至关重要的支持。</p>
+                  </div>
+                </div>
+                <div className="flex items-start bg-gradient-to-r from-indigo-50 to-white rounded-xl p-6">
+                  <span className="text-4xl mr-5 mt-1">🔄</span>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-1">灵活如水</h4>
+                    <p className="text-lg text-blue-700 font-semibold mb-2">变通·随形而化</p>
+                    <p className="text-lg text-gray-600">代表我们善于思考，不拘泥于教条，能为不同企业提供定制化的解决方案。</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
