@@ -41,7 +41,7 @@ export const posts = pgTable("posts", {
 	cover_image: varchar("cover_image", { length: 500 }),
 	category_id: integer("category_id"),
 	published: boolean().default(false).notNull(),
-	author: varchar("author", { length: 100 }).default("王佳媚"),
+	author: varchar("author", { length: 100 }).default("wushuang"),
 	view_count: integer("view_count").default(0).notNull(),
 	published_at: timestamp("published_at", { withTimezone: true, mode: 'string' }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),

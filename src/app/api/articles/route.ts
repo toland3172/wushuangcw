@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       excerpt: excerpt || null,
       category_id: category_id || null,
       published: published || false,
-      author: '王佳媚',
+      author: 'wushuang',
       view_count: 0,
       published_at: published ? new Date().toISOString() : null,
     }).returning();

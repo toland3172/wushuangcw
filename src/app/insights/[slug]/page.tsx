@@ -91,7 +91,7 @@ export default function ArticlePage() {
             </span>
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              {article.author || '王佳媚'}
+              {article.author || 'wushuang'}
             </span>
             <span>{article.view_count} 次阅读</span>
           </div>
