@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Comments from "@/components/finance/Comments";
 import { Calendar, User, ArrowLeft, ArrowRight, Phone, Tag } from 'lucide-react';
 import { db } from '@/lib/db';
 import { posts, categories, postTags, tags } from '@/storage/database/shared/schema';
@@ -184,26 +185,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           ) : <div />}
         </div>
 
-        {/* Related Articles */}
-        {relatedArticles.length > 0 && (
-          <div className="mt-10">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">相关推荐</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {relatedArticles.map((related) => (
-                <Link
-                  key={related.id}
-                  href={`/insights/${related.slug}`}
-                  className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow"
-                >
-                  <h4 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{related.title}</h4>
-                  {related.excerpt && (
-                    <p className="text-base text-gray-500 line-clamp-2">{related.excerpt}</p>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Comments */}
+        <Comments slug={slug} />
       </div>
     </div>
   );

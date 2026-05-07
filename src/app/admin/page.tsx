@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const ADMIN_PASSWORD = "wushuang2024";
@@ -10,14 +10,28 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
 
+  useEffect(() => {
+    // 检查是否已登录
+    const isLoggedIn = localStorage.getItem("admin_logged_in");
+    if (isLoggedIn === "true") {
+      setAuthenticated(true);
+    }
+  }, []);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
       setAuthenticated(true);
       setError(false);
+      localStorage.setItem("admin_logged_in", "true");
     } else {
       setError(true);
     }
+  };
+
+  const handleLogout = () => {
+    setAuthenticated(false);
+    localStorage.removeItem("admin_logged_in");
   };
 
   if (!authenticated) {
@@ -62,8 +76,18 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">文章管理后台</h1>
-        <p className="text-lg text-gray-600 mb-8">管理财税洞察的文章内容</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">文章管理后台</h1>
+            <p className="text-lg text-gray-600">管理财税洞察的文章内容</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="text-gray-600 hover:text-red-600 text-lg"
+          >
+            退出登录
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <a

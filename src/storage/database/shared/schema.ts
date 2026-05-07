@@ -80,3 +80,11 @@ export const postTags = pgTable("post_tags", {
 		}).onDelete("cascade"),
 	primaryKey({ columns: [table.postId, table.tagId], name: "post_tags_pkey"}),
 ]);
+
+export const comments = pgTable("comments", {
+  id: serial().primaryKey().notNull(),
+  postId: integer("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
+  authorName: varchar("author_name", { length: 100 }).notNull(),
+  content: text().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+});
