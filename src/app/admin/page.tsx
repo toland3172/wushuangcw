@@ -1,6 +1,64 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
+const ADMIN_PASSWORD = "wushuang2024";
+
 export default function AdminPage() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setAuthenticated(true);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+          <div className="text-center mb-6">
+            <div className="text-5xl mb-3">🔐</div>
+            <h1 className="text-2xl font-bold text-gray-900">文章管理后台</h1>
+            <p className="text-gray-500 mt-2">请输入管理员密码</p>
+          </div>
+
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="请输入密码"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {error && (
+              <p className="text-red-500 text-sm mb-4">密码错误，请重试</p>
+            )}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              登录
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-blue-600 hover:underline text-sm">
+              ← 返回首页
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-12">
