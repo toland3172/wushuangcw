@@ -15,7 +15,7 @@ export default function ChatBot({ onClose }: ChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "您好！我是若水财税的智能客服"小若"，很高兴为您服务！请问有什么可以帮到您的？",
+      content: "您好！我是若水财税的智能客服「小若」，很高兴为您服务！请问有什么可以帮到您的？",
     },
   ]);
   const [input, setInput] = useState("");
@@ -92,7 +92,7 @@ export default function ChatBot({ onClose }: ChatBotProps) {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
           role: "assistant",
-          content: "抱歉，服务暂时繁忙，请稍后再试或拨打服务热线：0731-2253-2031",
+          content: "抱歉，服务暂时繁忙，请稍后再试或拨打服务热线：13517401680",
         };
         return newMessages;
       });
