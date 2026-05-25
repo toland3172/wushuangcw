@@ -15,7 +15,7 @@ export default function ChatBot({ onClose }: ChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "您好！我是若水财税的智能客服「小若」，很高兴为您服务！请问有什么可以帮到您的？",
+      content: "您好！我是无双财税的智能客服「小若」，很高兴为您服务！我可以为您介绍我们的财税服务、解答常见问题。请问有什么可以帮到您的？",
     },
   ]);
   const [input, setInput] = useState("");
@@ -103,9 +103,9 @@ export default function ChatBot({ onClose }: ChatBotProps) {
 
   const quickQuestions = [
     "你们有哪些服务？",
-    "代理记账多少钱？",
-    "公司注册需要多久？",
-    "如何联系你们？",
+    "能帮我整理旧账乱账吗？",
+    "税务筹划怎么做？",
+    "如何联系人工客服？",
   ];
 
   return (
