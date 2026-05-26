@@ -15,7 +15,7 @@ export default function ChatBot({ onClose }: ChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "您好！我是无双财税的智能客服「小若」，很高兴为您服务！我可以为您介绍我们的财税服务、解答常见问题。请问有什么可以帮到您的？",
+      content: "您好！我是若水财税的智能客服「小若」，很高兴为您服务！我可以为您介绍我们的财税服务、解答常见问题。请问有什么可以帮到您的？",
     },
   ]);
   const [input, setInput] = useState("");
@@ -109,7 +109,7 @@ export default function ChatBot({ onClose }: ChatBotProps) {
   ];
 
   return (
-    <div className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 z-50">
+    <div className="fixed inset-4 sm:inset-auto sm:bottom-24 sm:right-6 sm:w-96 sm:max-w-[calc(100vw-3rem)] h-[calc(100vh-2rem)] sm:h-[600px] sm:max-h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 z-50">
       {/* 头部 */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
