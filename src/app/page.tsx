@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import FinanceNavbar from "@/components/finance/Navbar";
 import FinanceFooter from "@/components/finance/Footer";
 import Link from "next/link";
@@ -26,7 +25,6 @@ export default function HomePage() {
       <FinanceNavbar />
 
       <main className="flex-1">
-        {/* Hero Section - 压缩版 */}
         <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white py-10 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl md:text-5xl font-bold mb-4">
@@ -49,7 +47,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Service Categories - 卡片网格 + 手风琴展开 */}
         <section id="services" className="py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-3">我们的服务</h2>
@@ -63,7 +60,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Why Choose Us */}
         <section className="py-12 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8">为什么选择我们</h2>
@@ -84,7 +80,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Contact CTA */}
         <section className="py-12 bg-blue-600">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">需要财税服务？</h2>
@@ -105,12 +100,6 @@ export default function HomePage() {
       </main>
 
       <FinanceFooter />
-
-      {/* AI 客服小若 - 通过 next/script 加载 */}
-      <Script
-        src="https://173fa8f8-fa55-4277-9605-7b4a51030d8c.dev.coze.site/chat-widget.js"
-        strategy="afterInteractive"
-      />
     </div>
   );
 }
