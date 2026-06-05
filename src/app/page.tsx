@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import FinanceNavbar from "@/components/finance/Navbar";
 import FinanceFooter from "@/components/finance/Footer";
 import Link from "next/link";
@@ -105,10 +106,10 @@ export default function HomePage() {
 
       <FinanceFooter />
 
-      {/* AI 客服小若 - 嵌入脚本 */}
-      <script
+      {/* AI 客服小若 - 通过 next/script 加载 */}
+      <Script
         src="https://173fa8f8-fa55-4277-9605-7b4a51030d8c.dev.coze.site/chat-widget.js"
-        async
+        strategy="afterInteractive"
       />
     </div>
   );
