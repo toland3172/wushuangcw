@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -40,6 +41,10 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className="antialiased">
         {children}
+        <Script
+          src="https://173fa8f8-fa55-4277-9605-7b4a51030d8c.dev.coze.site/chat-widget.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
