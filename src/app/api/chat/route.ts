@@ -1,325 +1,209 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
+const SYSTEM_PROMPT = `你是"若水财税"（株洲若水财税服务有限公司）的AI客服助手，名字叫小若。你只能基于以下知识库内容回答用户问题。
 
-// 系统提示词 - 基于公司知识库
-const SYSTEM_PROMPT = `你是"株洲若水财税"的智能客服顾问，名为"小若"。你的主要职责是：
-1. 解答常见财税概念、服务流程、报价咨询
-2. 解释公司能提供的合规服务（账务梳理、整改方案、税务咨询等）
-3. 引导客户留下信息或转人工
+【公司基本信息】
+- 公司全称：株洲若水财税服务有限公司
+- 主营业务：代理记账、税务筹划、公司注册、财务咨询、审计协助等
+- 联系电话：13517401680
+- 公司地址：湖南省株洲市石峰区
 
-## 公司信息
-- **公司全称**：株洲若水财税服务有限公司
-- **品牌名**：若水财税
-- **服务热线/手机**：13517401680
-- **微信号**：W13517401680
-- **邮箱**：wang@wushuangcw.top
-- **官网**：https://wushuangcw.top
-- **地址**：株洲市（长沙设有业务联络点）
+【服务范围】
+1. 财务外包：日常账务处理、财务报表编制、凭证整理与装订、财务档案管理
+2. 税务服务：税务健康检查、纳税申报协助、汇算清缴辅导、税收优惠政策申请、税务筹划、个人所得税筹划、研发费用加计扣除
+3. 财务咨询：财务制度建设、财务分析、成本核算优化、内控体系建设、财务人员培训、投资决策支持、上市财务顾问
+4. 香港公司服务：香港公司账务处理、香港公司审计协助、跨境税务咨询
+5. 高新与IPO服务：高新技术企业认定辅导、研发费用归集辅导、IPO前期合规辅导
+6. 培训与赋能：会计实操培训、财税政策解读、金蝶/用友软件培训、税务筹划培训、企业内训定制、老板财税通识课
+7. 增值服务：公司注册/变更、资质代办、银行开户协助、税务登记协助
 
-## 核心优势
-1. 23年实战经验，精通企业财务痛点，能快速诊断账务风险
-2. 持有中级会计师、税务师双证，专业有保障
-3. 擅长梳理乱账、设计整改方案，帮助企业财务合规
-4. 服务覆盖内地与香港，熟悉跨境税务与架构优化
-5. 价格透明，无隐形收费，先诊断后出方案
+【回答规则】
+- 严格基于以上信息回答，不得编造
+- 不提供具体避税方案
+- 不评论同行
+- 不暗示可代客户做账报税（公司无代理记账许可证）
+- 当用户问及敏感问题（如"如何少交税"），引导至合法合规的税务筹划服务
+- 触发转人工关键词时（如"人工""投诉""退款"），回复："如需人工服务，请拨打我们的服务热线：13517401680，工作时间为周一至周五 9:00-18:00。"
+- 回答风格：专业、简洁、有温度`;
 
-## 服务产品
-
-### 账务梳理与整改
-- 协助企业整理历史遗留的错账、乱账、单据不全等问题，形成清晰的账务梳理报告
-- 根据梳理结果，提供财务和税务整改方案（科目调整建议、补税或退税方案、内控流程优化）
-- 指导贵公司财务人员按照合规方式记账和申报，或帮筛选合规的代账机构
-- 出具的整改方案可作为企业自查、应对外部审计或税务稽查的重要参考
-
-### 税务筹划
-- 企业所得税、增值税、个人所得税的合理筹划方案
-- 研发费用加计扣除、高新技术企业税收优惠申请辅导
-- 跨境业务的转让定价、税收协定利用咨询
-- 企业设立、股权转让、注销等环节的税务规划
-
-### 高新技术企业认定辅导
-- 评估企业是否符合高企条件
-- 协助归集研发费用，规范研发辅助账
-- 准备申报材料，辅导知识产权规划
-- 跟进认定后的税收优惠备案及后续核查
-
-### 出口退税辅导
-- 协助办理出口退（免）税备案
-- 指导整理报关单、发票、合同、物流单等单证
-- 通过电子税务局辅导客户自行申报退税，或协助与税务沟通
-- 对跨境电商9810模式，提供"离境即退税"预退税和后续核算的咨询辅导
-
-### 香港公司财税服务
-- 与香港持牌核数师合作，为内地客户提供一站式咨询与辅助服务
-- 香港公司记账及财务报表编制指导
-- 香港利得税、薪俸税申报辅导
-- 协调香港会计师出具审计报告（由香港方签署）
-- 香港公司年审、秘书服务对接
-
-### 财务尽职调查与内控设计
-- 专项财务尽调、内控体系设计、财务流程优化
-- 帮助企业识别经营风险，完善内部控制
-
-### 培训与赋能
-- 会计实操培训、财税政策解读、软件培训、企业内训定制、老板财税通识课
-
-## 收费说明
-- 费用根据服务类型、企业规模、票据数量、账务复杂程度等因素综合报价，无任何隐形收费
-- 账务梳理：按项目收费，根据乱账程度和年数评估
-- 税务筹划/高企辅导：按项目收费
-- 常年财务顾问：可包年或按次收费
-- 具体可联系客服或预约免费咨询，会提供详细报价单
-
-## 业务流程
-第一次合作通常需要提供：
-- 账务梳理：近几年的会计凭证、账簿、财务报表、银行对账单、纳税申报表、发票存根联等
-- 税务筹划：近一年度的财务报表、纳税申报表、业务合同等
-- 高企辅导：近三年的财务审计报告、研发费用辅助账、知识产权证书等
-- 出口退税：报关单、增值税专用发票、出口合同、物流单据等
-
-## 上门服务
-- 长沙、株洲地区可安排顾问上门取票或现场咨询
-- 外地客户主要通过线上对接，资料可快递或电子传输
-
-## 信息安全
-- 与员工签订保密协议，所有财务数据仅用于为客户提供服务，绝不外泄
-- 使用加密传输和内部权限管理系统，确保客户信息安全
-
-## 重要声明
-我们尚未申请代理记账许可证，不能直接替客户完成每月的记账、凭证填制及纳税申报。但可以帮梳理历史乱账、出具整改方案、提供财税合规咨询，并指导财务人员正确记账和申报。如需长期代理记账服务，可推荐合规的代账机构。
-
-## 安全边界（AI不得回答的内容，必须引导联系人工）
-1. 不得提供具体的避税操作方案（只能给原则性建议）
-2. 不得虚构成功案例或承诺一定能退税/通过高企
-3. 不得评论其他同行
-4. 不得暗示可以"代客户做账报税"（因为公司没有许可证）
-5. 不得接收客户上传的含有敏感信息的文件（应引导通过加密渠道发送）
-
-遇到以下情况必须转人工：
-- "具体能省多少钱？"
-- "能不能不交税？"
-- "帮我做一套避税方案。"
-- "我公司情况特殊，你们怎么处理？"
-- "你们比XX公司好在哪里？"
-- "我想让你们帮我每个月做账。"
-- "多少钱可以代理记账？"
-
-转人工标准回复："您好，您咨询的问题涉及具体税务方案或需要个性化服务，为了给您更准确的解答，我建议您联系我们的财税专家，一对一为您服务。感谢理解！"
-
-## 客户要求代理记账时的回复
-"您好，目前我们主要提供账务梳理、整改方案以及财务咨询。如果您需要委托我们进行每月的代理记账，暂时我们尚未取得许可证。不过我们可以先帮您把历史账务理顺，给出合规操作建议，这样您后续找其他代账机构或自己处理都会更清晰。是否需要我们先为您做个账务健康检查？"
-
-## 如何联系人工客服
-如果客户需要人工服务，请提供以下联系方式：
-1. **电话咨询**：13517401680
-2. **微信联系**：搜索微信号 W13517401680
-3. **邮箱联系**：wang@wushuangcw.top
-
-鼓励客户直接电话咨询，说明"人工服务更贴心，可以根据您的具体情况给出专业建议"
-
-## 回答原则
-1. 保持专业、热情、耐心的服务态度
-2. 回答简洁明了，突出公司优势
-3. 如遇到复杂问题或超出知识库，建议客户联系人工
-4. 不要虚构具体价格，可以说"具体费用根据实际情况面议"
-5. 始终保持友好礼貌
-6. 不确定的问题不要随意回答，引导联系人工`;
-
-// 预设FAQ作为fallback
-const FAQ_ANSWERS: Record<string, string> = {
-  "服务": `若水财税主要有以下专业服务：
-
-1. **账务梳理与整改**：整理历史错账乱账、出具整改方案、指导合规记账
-2. **税务筹划**：企业所得税/增值税/个税筹划、研发费用加计扣除、跨境税务
-3. **高新技术企业认定辅导**：评估条件、归集研发费用、准备申报材料、跟进优惠备案
-4. **出口退税辅导**：退（免）税备案、单证整理指导、9810模式咨询
-5. **香港公司财税服务**：与香港持牌核数师合作，记账/审计/年审一站式服务
-6. **财务尽职调查与内控设计**：尽调、内控体系、流程优化
-7. **培训与赋能**：会计实操、财税政策解读、企业内训定制
-
-23年实战经验，中级会计师+税务师双证，价格透明无隐形收费！欢迎拨打13517401680咨询~`,
-
-  "价格": `您好！我们的费用根据服务类型、企业规模、票据数量、账务复杂程度等因素综合报价，无任何隐形收费：
-
-- **账务梳理**：按项目收费，根据乱账程度和年数评估
-- **税务筹划/高企辅导**：按项目收费
-- **常年财务顾问**：可包年或按次收费
-
-具体可联系客服或预约免费咨询，我们会提供详细报价单。欢迎拨打13517401680或添加微信W13517401680咨询！`,
-
-  "代理记账": `您好，目前我们尚未申请代理记账许可证，不能直接替客户完成每月的记账和纳税申报。不过我们可以：
-
-1. 帮您梳理历史乱账，出具整改方案
-2. 指导您或您的财务人员正确记账和申报
-3. 帮您筛选合规的代账机构
-
-是否需要我们先为您做个账务健康检查？欢迎拨打13517401680咨询~`,
-
-  "注册": `您好！公司注册/变更我们可以协助办理（合作代办模式）：
-
-• 工商登记注册
-• 营业执照办理
-• 银行开户协助
-• 税务登记
-
-专业高效！有需要请拨打13517401680咨询具体流程和费用~`,
-
-  "税务": `您好！我们提供全面的税务服务：
-
-• 税务筹划（企业所得税、增值税、个税）
-• 研发费用加计扣除辅导
-• 高新技术企业税收优惠申请
-• 跨境业务转让定价咨询
-• 企业设立/股权转让/注销税务规划
-
-23年实战经验，持有税务师资质！欢迎拨打13517401680咨询~`,
-
-  "联系": `您好！联系我们有以下方式：
-
-1. **电话**：13517401680
-2. **微信**：W13517401680
-3. **邮箱**：wang@wushuangcw.top
-
-人工客服更贴心，能根据您的具体情况给出专业建议，欢迎随时联系！`,
-
-  "高企": `您好！我们拥有成功帮助科技型公司完成高新技术企业认定的实操经验：
-
-1. 评估企业是否符合高企条件
-2. 协助归集研发费用，规范研发辅助账
-3. 准备申报材料，辅导知识产权规划
-4. 跟进认定后的税收优惠备案及后续核查
-
-欢迎拨打13517401680咨询~`,
-
-  "出口退税": `您好！我们提供出口退税全流程辅导：
-
-1. 协助办理出口退（免）税备案
-2. 指导整理报关单、发票、合同、物流单等单证
-3. 辅导客户自行申报退税
-4. 跨境电商9810模式"离境即退税"咨询
-
-欢迎拨打13517401680咨询~`,
-
-  "香港": `您好！我们与香港持牌核数师合作，提供香港公司一站式服务：
-
-1. 香港公司记账及财务报表编制指导
-2. 香港利得税、薪俸税申报辅导
-3. 协调香港会计师出具审计报告
-4. 香港公司年审、秘书服务对接
-
-欢迎拨打13517401680咨询~`,
-
-  "default": `您好！我是若水财税的智能客服小若~
-
-我们可以帮您解决：
-• 账务梳理与整改
-• 税务筹划
-• 高新技术企业认定辅导
-• 出口退税辅导
-• 香港公司财税服务
-• 财务尽调与内控设计
-• 培训与赋能
-
-23年实战经验，中级会计师+税务师双证！
-
-如需详细咨询，欢迎：
-📞 拨打13517401680
-💬 添加微信W13517401680
-
-人工客服随时为您服务！`
+// 简易FAQ匹配
+const FAQ: Record<string, string> = {
+  "你们有哪些服务": "我们提供7大类服务：\n1. 财务外包（日常账务处理、报表编制等）\n2. 税务服务（纳税申报、税务筹划等）\n3. 财务咨询（制度建设、内控体系等）\n4. 香港公司服务\n5. 高新与IPO服务\n6. 培训与赋能\n7. 增值服务（公司注册等）\n\n您对哪项服务感兴趣？",
+  "能帮我整理旧账乱账吗": "当然可以！我们的财务外包服务中包含账务梳理，可以协助您整理历史遗留的错账、乱账、单据不全等问题。请联系我们：13517401680",
+  "税务筹划怎么做": "我们的税务服务包括税务健康检查、税收优惠政策申请、税务筹划等。具体方案需要根据您的企业情况量身定制。建议您拨打 13517401680 预约免费初步咨询。",
+  "如何联系人工客服": "如需人工服务，请拨打我们的服务热线：13517401680，工作时间为周一至周五 9:00-18:00。",
+  "收费多少": "费用根据服务类型、企业规模、票据数量等因素综合报价，无任何隐形收费。建议您拨打 13517401680 获取免费报价。",
+  "联系电话": "我们的服务热线是：13517401680，工作时间为周一至周五 9:00-18:00。",
 };
 
-function findBestAnswer(question: string): string {
-  const q = question.toLowerCase();
-  
-  if (q.includes("服务") || q.includes("有哪些") || q.includes("能做什么")) return FAQ_ANSWERS["服务"];
-  if (q.includes("价格") || q.includes("费用") || q.includes("多少钱") || q.includes("收费")) return FAQ_ANSWERS["价格"];
-  if (q.includes("代理记账") || q.includes("帮我记账") || q.includes("每月做账")) return FAQ_ANSWERS["代理记账"];
-  if (q.includes("注册") || q.includes("公司注册") || q.includes("变更")) return FAQ_ANSWERS["注册"];
-  if (q.includes("高企") || q.includes("高新技术") || q.includes("认定")) return FAQ_ANSWERS["高企"];
-  if (q.includes("出口") || q.includes("退税") || q.includes("9810")) return FAQ_ANSWERS["出口退税"];
-  if (q.includes("香港") || q.includes("跨境")) return FAQ_ANSWERS["香港"];
-  if (q.includes("税务") || q.includes("税")) return FAQ_ANSWERS["税务"];
-  if (q.includes("联系") || q.includes("人工") || q.includes("微信") || q.includes("电话")) return FAQ_ANSWERS["联系"];
-  
-  return FAQ_ANSWERS["default"];
+function matchFAQ(input: string): string | null {
+  const normalized = input.trim().replace(/[？?！!。.，,]/g, "");
+  for (const [key, value] of Object.entries(FAQ)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return value;
+    }
+  }
+  return null;
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages } = await request.json();
-    const lastMessage = messages[messages.length - 1]?.content || "";
-    
-    // 尝试使用SDK
-    try {
-      const { LLMClient, Config } = await import("coze-coding-dev-sdk");
-      const config = new Config();
-      const client = new LLMClient(config);
-      
-      const fullMessages = [
-        { role: "system" as const, content: SYSTEM_PROMPT },
-        ...messages
-      ];
-      
-      const stream = client.stream(fullMessages, {
-        model: "doubao-seed-2-0-lite-260215",
-        temperature: 0.7
-      });
-      
+    const body = await request.json();
+
+    // 兼容两种格式：{messages:[...]} 或 {message, history}
+    let userMessage = "";
+    let chatHistory: Array<{ role: string; content: string }> = [];
+
+    if (body.messages) {
+      chatHistory = body.messages;
+      userMessage = chatHistory[chatHistory.length - 1]?.content || "";
+    } else if (body.message) {
+      userMessage = body.message;
+      chatHistory = body.history || [];
+    }
+
+    if (!userMessage) {
+      return NextResponse.json({ error: "请输入问题" }, { status: 400 });
+    }
+
+    // 先尝试FAQ匹配
+    const faqAnswer = matchFAQ(userMessage);
+    if (faqAnswer) {
       const encoder = new TextEncoder();
-      const streamResult = new ReadableStream({
-        async start(controller) {
-          try {
-            for await (const chunk of stream) {
-              if (chunk.content) {
-                controller.enqueue(encoder.encode(chunk.content.toString()));
-              }
-            }
-            controller.close();
-          } catch (error) {
-            console.error('Stream error:', error);
-            controller.error(error);
-          }
-        }
-      });
-      
-      return new Response(streamResult, {
-        headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Transfer-Encoding': 'chunked',
-          'Cache-Control': 'no-cache',
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(faqAnswer));
+          controller.close();
         },
       });
-    } catch (sdkError) {
-      console.error('SDK error, using fallback:', sdkError);
-      
-      // 使用FAQ fallback，逐字输出模拟打字效果
-      const answer = findBestAnswer(lastMessage);
-      const encoder = new TextEncoder();
-      
-      const streamResult = new ReadableStream({
-        async start(controller) {
-          for (let i = 0; i < answer.length; i++) {
-            controller.enqueue(encoder.encode(answer[i]));
-            await new Promise(resolve => setTimeout(resolve, 30));
-          }
-          controller.close();
-        }
-      });
-      
-      return new Response(streamResult, {
+      return new Response(stream, {
         headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Transfer-Encoding': 'chunked',
-          'Cache-Control': 'no-cache',
+          "Content-Type": "text/plain; charset=utf-8",
+          "Access-Control-Allow-Origin": "*",
         },
       });
     }
-  } catch (error) {
-    console.error('Chat API error:', error);
+
+    // 构建对话消息
+    const apiMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...chatHistory.slice(-10).map((m: { role: string; content: string }) => ({
+        role: m.role === "assistant" ? "assistant" : "user",
+        content: m.content,
+      })),
+    ];
+
+    // 调用 Coze API
+    const cozeApiToken = process.env.COZE_API_TOKEN || process.env.API_TOKEN || "";
+    const cozeBotId = process.env.COZE_BOT_ID || process.env.BOT_ID || "";
+
+    if (cozeApiToken && cozeBotId) {
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            const response = await fetch("https://api.coze.cn/v3/chat", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${cozeApiToken}`,
+              },
+              body: JSON.stringify({
+                bot_id: cozeBotId,
+                user_id: "web-user-" + Date.now(),
+                stream: true,
+                auto_save_history: true,
+                additional_messages: apiMessages,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`Coze API error: ${response.status}`);
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+
+            if (reader) {
+              let buffer = "";
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() || "";
+
+                for (const line of lines) {
+                  if (line.startsWith("data:")) {
+                    const data = line.slice(5).trim();
+                    if (data === "[DONE]" || data === '"[DONE]"') {
+                      controller.close();
+                      return;
+                    }
+                    try {
+                      const parsed = JSON.parse(data);
+                      if (parsed.type === "answer" && parsed.content) {
+                        controller.enqueue(encoder.encode(parsed.content));
+                      }
+                    } catch {
+                      // ignore parse errors
+                    }
+                  }
+                }
+              }
+            }
+            controller.close();
+          } catch {
+            // Fallback to default response
+            controller.enqueue(
+              encoder.encode("抱歉，AI服务暂时繁忙，请拨打我们的服务热线：13517401680")
+            );
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Access-Control-Allow-Origin": "*",
+          "Transfer-Encoding": "chunked",
+        },
+      });
+    }
+
+    // 无API配置时的兜底回复
+    const fallbackReply = `感谢您的咨询！关于"${userMessage}"，建议您拨打我们的服务热线 13517401680 获取专业解答，我们的顾问会为您提供详细方案。`;
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(fallbackReply));
+        controller.close();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  } catch {
     return NextResponse.json(
-      { error: '服务暂时繁忙，请拨打13517401680或添加微信W13517401680联系我们' },
+      { error: "服务暂时繁忙，请稍后重试" },
       { status: 500 }
     );
   }
