@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "请输入问题" }, { status: 400 });
     }
 
-    // 代理到 Coze 部署的 chat API（流式转发）
+    // 代理到 Coze 部署的 chat API
     const proxyResponse = await fetch(COZE_CHAT_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       throw new Error(`Proxy error: ${proxyResponse.status}`);
     }
 
-    // 流式透传
+    // 解析 SSE 流，提取纯文本内容返回给前端
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
@@ -55,14 +55,57 @@ export async function POST(request: NextRequest) {
           return;
         }
         const decoder = new TextDecoder();
+        let buffer = "";
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            controller.enqueue(value);
+            buffer += decoder.decode(value, { stream: true });
+            // 按行解析 SSE 数据
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith("data:")) {
+                const dataStr = trimmed.slice(5).trim();
+                if (dataStr === "[DONE]" || dataStr === '"[DONE]"') {
+                  continue;
+                }
+                try {
+                  const parsed = JSON.parse(dataStr);
+                  if (parsed.content) {
+                    controller.enqueue(encoder.encode(parsed.content));
+                  }
+                } catch {
+                  // 非 JSON，直接透传
+                  if (dataStr && dataStr !== "[DONE]") {
+                    controller.enqueue(encoder.encode(dataStr));
+                  }
+                }
+              }
+            }
           }
-        } catch {
-          // ignore
+          // 处理剩余 buffer
+          if (buffer.trim()) {
+            const trimmed = buffer.trim();
+            if (trimmed.startsWith("data:")) {
+              const dataStr = trimmed.slice(5).trim();
+              if (dataStr !== "[DONE]" && dataStr !== '"[DONE]"') {
+                try {
+                  const parsed = JSON.parse(dataStr);
+                  if (parsed.content) {
+                    controller.enqueue(encoder.encode(parsed.content));
+                  }
+                } catch {
+                  if (dataStr && dataStr !== "[DONE]") {
+                    controller.enqueue(encoder.encode(dataStr));
+                  }
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Stream parse error:", err);
         }
         controller.close();
       },
@@ -70,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     return new Response(stream, {
       headers: {
-        "Content-Type": proxyResponse.headers.get("Content-Type") || "text/event-stream",
+        "Content-Type": "text/plain; charset=utf-8",
         "Access-Control-Allow-Origin": "*",
         "Transfer-Encoding": "chunked",
       },
