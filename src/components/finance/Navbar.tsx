@@ -28,6 +28,13 @@ export default function FinanceNavbar() {
     };
   }, [isChatOpen]);
 
+  // 监听页面内其他按钮触发的 open-chat 事件
+  useEffect(() => {
+    const handleOpenChat = () => setIsChatOpen(true);
+    document.addEventListener("open-chat", handleOpenChat);
+    return () => document.removeEventListener("open-chat", handleOpenChat);
+  }, []);
+
   return (
     <>
       <nav className="bg-white shadow-md sticky top-0 z-50">
