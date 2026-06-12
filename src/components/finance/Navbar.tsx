@@ -28,11 +28,26 @@ export default function FinanceNavbar() {
     };
   }, [isChatOpen]);
 
-  // 监听页面内其他按钮触发的 open-chat 事件
+  // 监听页面内其他按钮触发的 open-chat 事件和 data-chat-open 点击
   useEffect(() => {
     const handleOpenChat = () => setIsChatOpen(true);
     document.addEventListener("open-chat", handleOpenChat);
-    return () => document.removeEventListener("open-chat", handleOpenChat);
+
+    // 点击带有 data-chat-open 属性的元素时打开聊天
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const chatBtn = target.closest("[data-chat-open]");
+      if (chatBtn) {
+        e.preventDefault();
+        setIsChatOpen(true);
+      }
+    };
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("open-chat", handleOpenChat);
+      document.removeEventListener("click", handleClick);
+    };
   }, []);
 
   return (
