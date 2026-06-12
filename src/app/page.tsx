@@ -37,12 +37,13 @@ export default function HomePage() {
               <a href="tel:13517401680" className="inline-flex items-center justify-center bg-white text-blue-700 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-colors">
                 📞 立即致电：13517401680
               </a>
-              <button
-                id="open-chat-btn"
+              <a
+                href="#"
+                onClick="event.preventDefault(); document.dispatchEvent(new CustomEvent('open-chat'));"
                 className="inline-flex items-center justify-center border-2 border-white/40 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white/10 transition-colors"
               >
                 💬 AI客服小若在线咨询
-              </button>
+              </a>
             </div>
           </div>
         </section>
@@ -88,12 +89,13 @@ export default function HomePage() {
               <a href="tel:13517401680" className="inline-flex items-center bg-white text-blue-700 px-10 py-4 rounded-lg text-xl font-semibold hover:bg-blue-50 transition-colors">
                 📞 拨打热线：13517401680
               </a>
-              <button
-                id="open-chat-btn-cta"
+              <a
+                href="#"
+                onClick="event.preventDefault(); document.dispatchEvent(new CustomEvent('open-chat'));"
                 className="inline-flex items-center bg-blue-500 text-white px-10 py-4 rounded-lg text-xl font-semibold hover:bg-blue-400 transition-colors"
               >
                 💬 AI客服在线咨询
-              </button>
+              </a>
             </div>
           </div>
         </section>
